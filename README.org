@@ -1,11 +1,7 @@
 #+title: dlm - a download manager
 #+language: en
+#+SETUPFILE: ~/.emacs.d/org-templates/eknet-3.org
 #+OPTIONS: toc:t num:nil
-#+SETUPFILE: ~/.emacs.d/src/org-html-themes/setup/theme-readtheorg.setup
-#+HTML_HEAD: <link rel="stylesheet" href="https://eknet.org/css/styles/color-brewer.css">
-#+HTML_HEAD: <script src="https://eknet.org/js/highlight.pack.js"></script>
-#+HTML_HEAD: <script>var hlf = function() { Array.prototype.forEach.call(document.querySelectorAll('pre.src'), function(block) {var css, lang; css = block.getAttribute("class"); lang = css.replace(/src-?| /g, ""); if (lang == "js") {lang = "javascript";} block.setAttribute("class", css + " " + lang); hljs.highlightBlock(block);}); }; addEventListener('DOMContentLoaded', hlf); addEventListener('load', hlf);</script>
-#+HTML_HEAD: <style type="text/css"> pre code { white-space: pre; border: none; font-size: 12px; }</style>
 
 * COMMENT Emacs setup                                              :noexport:
 
@@ -573,6 +569,9 @@ variables ~*pending-actions-alist*~ and ~*pending-actions-args*~
 instead.
 
 * Building
+
+#+attr_html: style="display:inline;"
+https://travis-ci.org/eikek/dlm.svg
 
 ** Using Nix
 
