@@ -365,6 +365,13 @@ true, do not delete anything."
         (format nil "~a = ~a" key (%db-sql-value metadata key))
         (format nil "~a like '~a'" key (%db-sql-value metadata key)))))
 
+(defvar dlm--metadata-format-string
+  (concatenate
+   'string
+   "[~:[.~;" (green "k") "~]~:[" (red "!") "~;e~]]"
+   "[~3d] ~a ~a ~a "
+   (magenta "[~a]")))
+
 (defun dlm-format-metadata (metadata)
   "Make a one-line string from METADATA."
   (let* ((filename (getf metadata :location))
@@ -373,7 +380,7 @@ true, do not delete anything."
          (file (if filename (probe-file filename)))
          (ltime (or (getf metadata :lifetime) 0))
          (secs (or (and file (file-atime-since file)) 0)))
-    (format nil "[~:[.~;k~]~:[!~;e~]][~3d] ~a ~a ~a [~a]"
+    (format nil dlm--metadata-format-string
             keep
             (and file (probe-file file))
             (getf metadata :redownloads)

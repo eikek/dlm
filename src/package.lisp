@@ -55,7 +55,7 @@
            as-int))
 
 (defpackage :dlm
-  (:use :cl :sqlite :dlm-util)
+  (:use :cl :sqlite :cl-ansi-text :dlm-util)
   (:export *database*
            *fetch-default-bin*
            *fetch-default-args*

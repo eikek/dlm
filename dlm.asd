@@ -6,7 +6,7 @@
   :author "Eike Kettner <eike.kettner@posteo.de>"
   :entry-point "dlm-cli:main"
   :licence "GPLv3"
-  :depends-on (:unix-options :ironclad :external-program :sqlite)
+  :depends-on (:unix-options :ironclad :external-program :sqlite :cl-ansi-text)
   :pathname "src"
   :components ((:file "package")
                (:file "utils" :depends-on ("package"))

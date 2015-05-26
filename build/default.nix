@@ -196,6 +196,59 @@ let
         sha256 = "1rgxw6caj339ihpxks6f1q80ahd3ama3gfisbd7l3xc996s3s4ag";
       };
     };
+
+    anaphora = buildLispPackage rec {
+      baseName = "anaphora";
+      description = "";
+      version = "0.9.4";
+      deps = [];
+      src = pkgs.fetchurl {
+        url = https://common-lisp.net/project/anaphora/files/anaphora-0.9.4.tar.gz;
+        sha256 = "0gwq8gp1ycbdmvydg03grjaii8765dz6yzvnrw0lrkwqnkh38wsy";
+      };
+    };
+
+    let-plus = buildLispPackage rec {
+      baseName = "let-plus";
+      description = "Destructuring extension of LET*.";
+      version = "master-079730bf";
+      deps = [ alexandria anaphora ];
+      src = pkgs.fetchgit {
+        url = https://github.com/tpapp/let-plus;
+        rev = "079730bfca755b4dcaf5295e380eb5adf3fc6a7c";
+        sha256 = "0xzg7gavcxrh43vzdzj68c6ixsnmpk0aip9j5yx78xxwv1nr09f0";
+      };
+    };
+
+    cl-colors = buildLispPackage rec {
+      baseName = "cl-colors";
+      description = "This is a very simple color library for Common Lisp.";
+      version = "master-9340ccdf";
+      deps = [ let-plus alexandria ];
+      src = pkgs.fetchgit {
+        url = https://github.com/tpapp/cl-colors;
+        rev = "9340ccdffe1e52beafa8b13deb6e4f71c44fdfa0";
+        sha256 = "1kiriylbj81f5h2dhl4396a4fhbyd2xrss340v6j918wjn5fka98";
+      };
+      overrides = x: {
+        patchPhase = ''
+          rm Makefile
+        '';
+      };
+    };
+
+    cl-ansi-text = buildLispPackage rec {
+      baseName = "cl-ansi-text";
+      description = "Because color in your terminal is nice.";
+      version = "master-6dca2239";
+      deps = [ cl-colors alexandria ];
+      src = pkgs.fetchgit {
+        url = https://github.com/pnathan/cl-ansi-text;
+        rev = "6dca2239033c628015a7d12a63d673314c316374";
+        sha256 = "07izgb0c511fzcbfic0n7zxgwhbnjfga3igm0q5rawpihpf0caws";
+      };
+    };
+
   };
 in
 pkgs.stdenv.mkDerivation rec {
@@ -231,6 +284,7 @@ pkgs.stdenv.mkDerivation rec {
     unix-options
     ironclad
     cl-sqlite
+    cl-ansi-text
     external-program
     pkgs.sqlite
 
