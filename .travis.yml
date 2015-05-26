@@ -1,0 +1,20 @@
+language: lisp
+
+sudo: required
+
+env:
+  matrix:
+    - LISP=sbcl
+
+install:
+  - curl -L https://github.com/luismbo/cl-travis/raw/master/install.sh | sh
+
+script:
+  - cl -e '(ql:quickload (quote (:unix-options
+                           :ironclad
+                           :external-program
+                           :sqlite
+                           :cl-ansi-text
+                           :fiveam)))
+           (load "build/build.lisp")
+           (cl-user::test-dlm-and-exit)'
