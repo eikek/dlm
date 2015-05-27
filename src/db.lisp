@@ -22,8 +22,8 @@
   "The database file. Default is nil and can be set by the user.")
 
 (defun %database ()
-  (or *database*
-      (ensure-directories-exist
+  (ensure-directories-exist
+   (or *database*
        (merge-pathnames #p".config/dlm/dlm.db"
                         (user-homedir-pathname)))))
 
@@ -75,6 +75,7 @@
                   ,@body))
                ((not ,(cadr var))
                 (with-open-database (,(car var) (%database))
+                  (%db-init ,(car var))
                   ,@body))
                (t (error "Invalid form."))))
       `(with-open-database (,var (%database))
@@ -164,6 +165,8 @@ with `keys'."
 
 (defun db-upsert! (metadata db &key table)
   "Add METADATA to the database, replacing existing entries."
+  (unless table
+    (error "No table specified."))
   (unless (getf metadata :error)
     (%db-update metadata db :table table))
   metadata)

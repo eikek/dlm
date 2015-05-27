@@ -9,6 +9,7 @@
   "Runs all tests. If EXIT is true, exit lisp with return code
 depending on test result."
   (let ((pkgs '((:dlm-util-test . :dlm-util-suite)
+                (:dlm-test . :dlm-suite)
                 (:dlm-cli-test . :dlm-cli-suite))))
     (flet ((runtest (suite)
              (let* ((result (fiveam:run suite))
@@ -33,3 +34,10 @@ depending on test result."
 
 (in-package :dlm-cli-test)
 (fiveam:def-suite :dlm-cli-suite :description "Tests for dlm-cli")
+
+
+(defpackage :dlm-test
+  (:use :cl :fiveam :sqlite :cl-ansi-text :dlm-util :dlm))
+
+(in-package :dlm-test)
+(fiveam:def-suite :dlm-suite :description "Tests for dlm.lisp")

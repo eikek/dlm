@@ -474,13 +474,13 @@ updating the database accordingly."
          (format t "Skip deleting '~a' as it does not exist.~%" filename))))))
 
 (defun dlm-add-local (filename &key keep lifetime db)
-  (let* ((file (probe-file filename))
+  (let* ((file (truename filename))
          (meta (make-download-metadata file
                                        :source filename
                                        :keep keep
                                        :lifetime (or lifetime *file-lifetime*))))
     (with-database (curdb db)
-      (db-upsert! meta curdb)
+      (db-upsert! meta curdb :table "dlm_files")
       meta)))
 
 (defun dlm-fetch (file-or-url &key target keep lifetime user pass)

@@ -25,4 +25,5 @@
   :pathname "tests"
   :components ((:file "suite")
                (:file "test-utils" :depends-on ("suite"))
-               (:file "test-dlm-cli" :depends-on ("suite"))))
+               (:file "test-dlm" :depends-on ("suite"))
+               (:file "test-cli" :depends-on ("suite"))))
