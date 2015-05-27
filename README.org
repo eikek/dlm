@@ -600,10 +600,20 @@ to build the executable and =make test= to run the tests.
 ** Manually
 
 See the =dlm.asd= file for the dependencies. It should be [[https://common-lisp.net/project/fiveam/][fiveam]],
-[[https://common-lisp.net/project/cl-sqlite/][sqlite]], [[https://github.com/froydnj/ironclad][ironclad]], [[https://common-lisp.net/project/external-program/][external-program]] and [[https://github.com/astine/unix-options][unix-options]]. These must be
-installed (fiveam only for running the tests). Then you can use the
-=build/build.lisp= lisp file. Load it and call for example
-~(make-image)~ to create the executable.
+[[https://common-lisp.net/project/cl-sqlite/][sqlite]], [[https://github.com/froydnj/ironclad][ironclad]], [[https://common-lisp.net/project/external-program/][external-program]], [[https://github.com/astine/unix-options][unix-options]] and
+[[https://github.com/pnathan/cl-ansi-text][cl-ansi-text]]. These must be installed (fiveam only for running the
+tests). Then you can use the =build/build.lisp= lisp file. Load it and
+call for example ~(make-image)~ to create the executable.
+
+All dependencies can be installed via [[http://quicklisp.org][quicklisp]]. Install it and
+execute:
+
+#+begin_src shell
+  $ sbcl --eval '(ql:quickload (quote (:unix-options \
+                       :ironclad :external-program \
+                       :sqlite :cl-ansi-text :fiveam)))'
+#+end_src
+
 
 * Browser integration
 
