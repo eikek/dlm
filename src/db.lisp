@@ -150,7 +150,8 @@ is either 'dlm_files' or 'dlm_pending'."
 with `keys'."
   (when-let (meta (mapcan #'list keys values))
     (cond-> meta
-      ((equal 0 (getf meta :keep)) (update-metadata :keep nil)))))
+      ((equal 0 (getf meta :keep)) (update-metadata :keep nil))
+      ((/= 0 (getf meta :keep)) (update-metadata :keep t)))))
 
 (defun db-metadata-find (url db &key table (keycol "source"))
   "Finds a metadata entry for a given url."

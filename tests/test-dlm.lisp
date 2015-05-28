@@ -59,3 +59,28 @@
     (let ((meta (dlm::make-download-metadata "testfile.txt"
                                              :source "https://www.youtube.com/watch?v=-123M")))
       (is (eq nil (dlm::dlm-local-source? meta))))))
+
+(test dlm-info
+  (is (equalp '(:error :file-not-found :msg "The file does not exist.")
+              (dlm-info "blups")))
+  (with-file "afile"
+    (is (equalp '(:error :file-unknown :msg "The file is not known to dlm.")
+                (dlm-info "afile"))))
+  (with-file "test-download.txt"
+    (with-testdb
+      (dlm::dlm-add-local "test-download.txt" :keep t)
+      (let* ((info (dlm-info "test-download.txt"))
+             (fmeta (getf info :file-metadata))
+             (dmeta (getf info :db-metadata)))
+        (is (eq (getf info :metadata-valid?) t))
+        (is (eq (getf info :checks) nil))
+        (is (= 13 (getf fmeta :length)))
+        (is (string= (namestring (truename "test-download.txt"))
+                     (getf fmeta :location)))
+        (is (string= "00758616cd62b995f91e79198dd72cd7fc169d2aef79e373dc223b471bf33f8a"
+                     (getf fmeta :sha256)))
+        (is (string= "test-download.txt"
+                     (getf dmeta :source)))
+        (is (eq t (getf dmeta :keep)))
+        (is (= 0 (getf dmeta :redownloads)))
+        (is (= dlm::*file-lifetime* (getf dmeta :lifetime)))))))

@@ -520,12 +520,12 @@ contains :file-metadata, :db-metadata, :checks and :metadata-valid?."
          (metadb (if file
                      (with-database (curdb db)
                        (db-metadata-find-file (namestring file) curdb))))
-         (metareal (make-file-metadata filename))
+         (metareal (if file (make-file-metadata filename)))
          (checks (if metadb (check-file-metadata metadb))))
     (cond ((not file)
            '(:error :file-not-found :msg "The file does not exist."))
           ((not metadb)
-           '(:error :file-unknwon :msg "The file is not known to dlm."))
+           '(:error :file-unknown :msg "The file is not known to dlm."))
           (t
            (list :metadata-valid? (not checks)
                  :checks checks
