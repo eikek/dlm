@@ -270,8 +270,12 @@ and the given metadata into the database."
 (defun dlm-local-source? (metadata)
   "Return true if metadata has a local source instead of a remote
 url."
-  (string= (getf metadata :source)
-           (getf metadata :location)))
+  (let ((source (getf metadata :source))
+        (location (getf metadata :location)))
+    (and source location
+         (handler-case (probe-file source) (error nil))
+         (equal (probe-file source)
+                (probe-file location)))))
 
 (defun dlm-redownload (metadata &key user pass db)
   "Redownload a file. Same as `download' but increments the
@@ -372,7 +376,7 @@ true, do not delete anything."
    "[~3d] ~a ~a ~a "
    (magenta "[~a]")))
 
-(defun dlm-format-metadata (metadata)
+(defun dlm-format-metadata (metadata &optional stream)
   "Make a one-line string from METADATA."
   (let* ((filename (getf metadata :location))
          (source (getf metadata :source))
@@ -380,7 +384,7 @@ true, do not delete anything."
          (file (if filename (probe-file filename)))
          (ltime (or (getf metadata :lifetime) 0))
          (secs (or (and file (file-atime-since file)) 0)))
-    (format nil dlm--metadata-format-string
+    (format stream dlm--metadata-format-string
             keep
             (and file (probe-file file))
             (getf metadata :redownloads)
@@ -392,7 +396,7 @@ true, do not delete anything."
                 "  --  ")
             (format-bytes (getf metadata :length))
             filename
-            (if (string= source filename) "-" source))))
+            (if (dlm-local-source? metadata) "-" source))))
 
 (defun dlm-print-metadata (metadata &optional db)
   "Prints the given metadata to stdout in one line. The second

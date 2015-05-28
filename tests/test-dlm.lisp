@@ -36,3 +36,26 @@
                  (namestring (merge-pathnames "test-download.txt"))))
       (is (string= (getf meta :sha256)
                    "00758616cd62b995f91e79198dd72cd7fc169d2aef79e373dc223b471bf33f8a")))))
+
+(test is-local-meta
+  (with-file "testfile.txt"
+    (let ((meta (dlm::make-download-metadata "testfile.txt" :source "testfile.txt")))
+      (is (equal t (dlm::dlm-local-source? meta))))))
+
+(test format-local-meta
+  (with-file "testfile.txt"
+    (let* ((meta (dlm::make-download-metadata "testfile.txt" :source "testfile.txt"))
+           (str (string-split #\Space (dlm-format-metadata meta))))
+      (is (= (length str) 6))
+      (is (string= (nth 0 str) "[.e]["))
+      (is (string= (nth 1 str) "0]"))
+      (is (string= (nth 2 str) "1.0m"))
+      (is (string= (nth 3 str) "13.0bytes"))
+      (is (string= (nth 4 str) (namestring (truename "testfile.txt"))))
+      (is (string= (nth 5 str) "[35m[-][0m")))))
+
+(test dlm-local-source
+  (with-file "testfile.txt"
+    (let ((meta (dlm::make-download-metadata "testfile.txt"
+                                             :source "https://www.youtube.com/watch?v=-123M")))
+      (is (eq nil (dlm::dlm-local-source? meta))))))
