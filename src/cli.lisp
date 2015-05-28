@@ -104,6 +104,16 @@ file."
                           (format ,s "~(~a~):~(~a~) " ',el ,el))))
                  list))))
 
+(defun %query-action-print-metadata (metadata &optional db)
+  "Prints the given metadata to stdout in one line."
+  (declare (ignore db))
+  (let* ((envcolor (getenv "DLM_COLOR" t))
+         (color? (or (eq envcolor t)
+                     (string= envcolor "t")
+                     (string= envcolor "1"))))
+    (dlm-format-metadata metadata t color?)
+    (format t "~%")))
+
 (defun %query-action-fetch (md db)
   (if (file-metadata-valid? md)
       (echo "File already exists.")
@@ -188,7 +198,7 @@ returns FN if those are nil or a curried function of FN and ARGS."
         (apply #'curry fn args))))
 
 (defparameter *query-actions-alist*
-  `(("list" . ,(make-action-fn #'dlm-print-metadata))
+  `(("list" . ,(make-action-fn #'%query-action-print-metadata))
     ("short-list" . ,(make-action-fn #'%query-action-shortlist))
     ("structure" . ,(make-action-fn #'%query-action-structure))
     ("move" . ,(make-action-fn #'%query-action-move))
@@ -243,7 +253,9 @@ many characters).
 
 Actions are then applied to each file in the result. Actions are
 
-- list: (the default) print information to stdout
+- list: (the default) print information to stdout. By default output
+  is ansi-colored; this can be suppressed by setting the environment
+  variable DLM_COLOR=0.
 - short-list: print only the local filename to stdout
 - structure: print a lisp data
 - fetch: download the file again, if the file exists and the metadata

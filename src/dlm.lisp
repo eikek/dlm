@@ -369,14 +369,16 @@ true, do not delete anything."
         (format nil "~a = ~a" key (%db-sql-value metadata key))
         (format nil "~a like '~a'" key (%db-sql-value metadata key)))))
 
-(defvar dlm--metadata-format-string
+(defun dlm--metadata-format-string (&optional (color? t))
   (concatenate
    'string
-   "[~:[.~;" (green "k") "~]~:[" (red "!") "~;e~]]"
+   "[~:[.~;"
+   (if color? (green "k") "k") "~]~:["
+   (if color? (red "!") "!") "~;e~]]"
    "[~3d] ~a ~a ~a "
-   (magenta "[~a]")))
+   (if color? (magenta "[~a]") "[~a]")))
 
-(defun dlm-format-metadata (metadata &optional stream)
+(defun dlm-format-metadata (metadata &optional stream (color? t))
   "Make a one-line string from METADATA."
   (let* ((filename (getf metadata :location))
          (source (getf metadata :source))
@@ -384,7 +386,7 @@ true, do not delete anything."
          (file (if filename (probe-file filename)))
          (ltime (or (getf metadata :lifetime) 0))
          (secs (or (and file (file-atime-since file)) 0)))
-    (format stream dlm--metadata-format-string
+    (format stream (dlm--metadata-format-string color?)
             keep
             (and file (probe-file file))
             (getf metadata :redownloads)
@@ -398,13 +400,6 @@ true, do not delete anything."
             filename
             (if (dlm-local-source? metadata) "-" source))))
 
-(defun dlm-print-metadata (metadata &optional db)
-  "Prints the given metadata to stdout in one line. The second
-parameter is not used, but declared anyways to make it compatible to
-`dlm-query'."
-  (declare (ignore db))
-  (format t "~a~%" (dlm-format-metadata metadata)))
-
 (defun dlm-query (f meta-template &key filter (table "dlm_files"))
   "Queries the database according to the search template
 META-TEMPLATE. This is a plist just like normal metadata, but may not
@@ -415,7 +410,7 @@ function. The second argument is the current db handle."
   (let* ((clauses (mapcar (curry #'%make-sql-expression meta-template)
                           (remove-if-not #'keywordp meta-template)))
          (query (format nil "~{~a ~^and ~}" (delete-if #'not clauses)))
-         (fun (or f #'dlm-print-metadata))
+         (fun (or f (error "No query function supplied to dlm-query.")))
          (pred (or filter #'identity)))
     (with-database db
       (db-search (lambda (md db)

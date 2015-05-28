@@ -275,7 +275,9 @@ many characters).
 
 Actions are then applied to each file in the result. Actions are
 
-- list: (the default) print information to stdout
+- list: (the default) print information to stdout. By default output
+  is ansi-colored; this can be suppressed by setting the environment
+  variable DLM_COLOR=0.
 - short-list: print only the local filename to stdout
 - structure: print a lisp data
 - fetch: download the file again, if the file exists and the metadata
