@@ -198,6 +198,7 @@ dlm [--]info [OPTIONS] FILES
 Options are:
 #+begin_example
   -r, --raw-values  Print raw db data values instead of human readable form.
+  -s, --structure   Print information as a lisp data structure.
   -h, --help        Prints this summary
 #+end_example
 
@@ -276,6 +277,7 @@ Actions are then applied to each file in the result. Actions are
 
 - list: (the default) print information to stdout
 - short-list: print only the local filename to stdout
+- structure: print a lisp data
 - fetch: download the file again, if the file exists and the metadata
   matches the db, it is not downloaded again
 - delete: deletes the file on disk, but not the record in the database
@@ -364,8 +366,8 @@ Options are:
 Shows a short help for this program.
 
 If called without arguments, a little help is shown, listing all
-subcommands with a short description. If a subcommand is given, a more
-detailed help to this subcommand is shown (if provided).
+commands with a short description. If a command is given, a more
+detailed help to this command is shown (if provided).
 
 
 

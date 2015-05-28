@@ -33,6 +33,7 @@
   invalid ((#\C "invalid") nil "Show files where its metadata (sha256, size, lastmod timestamp) does not match the db entry.")
   noheader ((#\H "no-header") nil "Don't print search parameters header.")
   raw-values ((#\r "raw-values") nil "Print raw db data values instead of human readable form.")
+  structure ((#\s "structure") nil "Print information as a lisp data structure.")
 
   ;; parameters
   limit   ((#\l "limit") "" "Apply the action to the first 'n' items only.")
@@ -150,6 +151,10 @@ file."
   (declare (ignore db))
   (echo "~a" (getf md :location)))
 
+(defun %query-action-structure (md db)
+  (declare (ignore db))
+  (echo "~s" md))
+
 (defun %query-filter-limit (max)
   (let ((counter 0))
     (lambda (md)
@@ -172,7 +177,7 @@ file."
 (defun %action-candidates-string (prefix candidates)
   (with-output-to-string (s)
     (format s "The action name '~a' is ambiguous. What did you mean?~%" prefix)
-    (format s "~{- ~a~%~}~%" (mapcar #'car candidates))))
+    (format s "~{- ~a~%~}" (mapcar #'car candidates))))
 
 
 (defun make-action-fn (fn)
@@ -185,6 +190,7 @@ returns FN if those are nil or a curried function of FN and ARGS."
 (defparameter *query-actions-alist*
   `(("list" . ,(make-action-fn #'dlm-print-metadata))
     ("short-list" . ,(make-action-fn #'%query-action-shortlist))
+    ("structure" . ,(make-action-fn #'%query-action-structure))
     ("move" . ,(make-action-fn #'%query-action-move))
     ("set-lifetime" . ,(make-action-fn #'%query-action-set-lifetime))
     ("prune" . ,(make-action-fn #'%query-action-prune))
@@ -239,6 +245,7 @@ Actions are then applied to each file in the result. Actions are
 
 - list: (the default) print information to stdout
 - short-list: print only the local filename to stdout
+- structure: print a lisp data
 - fetch: download the file again, if the file exists and the metadata
   matches the db, it is not downloaded again
 - delete: deletes the file on disk, but not the record in the database
@@ -363,19 +370,17 @@ name. Only one action can be given at a time."
           (format s "~%")))
       (format s "~%"))))
 
-(defcommand info (raw-values &free files)
+(defcommand info (raw-values structure &free files)
   "Show information about downloaded files.
 
 For a given file the information from the database is displayed in
 key-value form."
-  (let ((failures?))
-    (dolist (file files)
-      (let ((info (dlm-info file)))
-        (if (getf info :error)
-            (progn
-              (setq failures? t)
-              (echo "~a: ~a" file (getf info :msg)))
-            (%info-print-metadata info raw-values t))))))
+  (dolist (file files)
+    (let ((info (dlm-info file)))
+      (cond ((getf info :error)
+             (echo "~a: ~a" file (getf info :msg)))
+            (structure (echo "~s" info))
+            (t (%info-print-metadata info raw-values t))))))
 
 
 
