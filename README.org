@@ -279,7 +279,7 @@ Actions are then applied to each file in the result. Actions are
   is ansi-colored; this can be suppressed by setting the environment
   variable DLM_COLOR=0.
 - short-list: print only the local filename to stdout
-- structure: print a lisp data
+- structure: print a lisp data structure
 - fetch: download the file again, if the file exists and the metadata
   matches the db, it is not downloaded again
 - delete: deletes the file on disk, but not the record in the database
