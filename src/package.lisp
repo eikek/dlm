@@ -68,6 +68,7 @@
            *download-notify-hook*
            file-metadata-valid?
            program-exists?
+           dlm-local-source?
            dlm-download
            dlm-add-local
            dlm-fetch

@@ -273,26 +273,24 @@ url."
   (let ((source (getf metadata :source))
         (location (getf metadata :location)))
     (and source location
-         (handler-case (probe-file source) (error nil))
-         (equal (probe-file source)
-                (probe-file location)))))
+         (string= source location))))
 
-(defun dlm-redownload (metadata &key user pass db)
+(defun dlm-redownload (metadata &key silent user pass db)
   "Redownload a file. Same as `download' but increments the
 `redownloads' counter. Overwrites existing files."
   (let* ((downloads (getf metadata :redownloads))
          (filename (getf metadata :location))
          (target (directory-namestring filename))
          (url (getf metadata :source)))
-    (when (dlm-local-source? metadata)
-      (error "~a: cannot download from a local source." filename))
-    (download url target
-              :db db
-              :user user
-              :pass pass
-              :keep (getf metadata :keep)
-              :redownloads (1+ downloads)
-              :lifetime (getf metadata :lifetime))))
+    (if (dlm-local-source? metadata)
+        (error "~a: cannot download from a local source.~%" filename)
+        (download url target
+                  :db db
+                  :user user
+                  :pass pass
+                  :keep (getf metadata :keep)
+                  :redownloads (1+ downloads)
+                  :lifetime (getf metadata :lifetime)))))
 
 (defun dlm-delete-file (metadata &key silent dry test db)
   "Deletes the file identified by METADATA from the filesystem and
@@ -475,7 +473,7 @@ updating the database accordingly."
 (defun dlm-add-local (filename &key keep lifetime db)
   (let* ((file (truename filename))
          (meta (make-download-metadata file
-                                       :source filename
+                                       :source (namestring file)
                                        :keep keep
                                        :lifetime (or lifetime *file-lifetime*))))
     (with-database (curdb db)

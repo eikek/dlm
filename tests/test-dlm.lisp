@@ -9,7 +9,8 @@
        (unwind-protect
            (progn
              ,@body)
-         (delete-file ,file)))))
+         (if (probe-file ,file)
+             (delete-file ,file))))))
 
 (defmacro with-testdb (&body body)
   (let ((name (gensym)))
@@ -25,7 +26,7 @@
 (test add-local-files
   (with-file "test-download.txt"
     (let* ((meta (with-testdb (dlm::dlm-add-local "test-download.txt" :keep t))))
-      (is (equal (getf meta :source) "test-download.txt"))
+      (is (equal (getf meta :source) (namestring (truename "test-download.txt"))))
       (is (equal (getf meta :keep) t))
       (is (equal (getf meta :redownloads) 0))
       (is (equal (getf meta :lifetime) dlm::*file-lifetime*))
@@ -39,12 +40,17 @@
 
 (test is-local-meta
   (with-file "testfile.txt"
-    (let ((meta (dlm::make-download-metadata "testfile.txt" :source "testfile.txt")))
-      (is (equal t (dlm::dlm-local-source? meta))))))
+    (let ((meta (dlm::make-download-metadata "testfile.txt"
+                                             :source (namestring (truename "testfile.txt")))))
+      (is (equal t (dlm::dlm-local-source? meta)))
+      (progn
+        (delete-file "testfile.txt")
+        (is (equal t (dlm::dlm-local-source? meta)))))))
 
 (test format-local-meta
   (with-file "testfile.txt"
-    (let* ((meta (dlm::make-download-metadata "testfile.txt" :source "testfile.txt"))
+    (let* ((meta (dlm::make-download-metadata "testfile.txt"
+                                              :source (namestring (truename "testfile.txt"))))
            (str (string-split #\Space (dlm-format-metadata meta))))
       (is (= (length str) 6))
       (is (string= (nth 0 str) "[.e]["))
@@ -79,7 +85,7 @@
                      (getf fmeta :location)))
         (is (string= "00758616cd62b995f91e79198dd72cd7fc169d2aef79e373dc223b471bf33f8a"
                      (getf fmeta :sha256)))
-        (is (string= "test-download.txt"
+        (is (string= (namestring (truename "test-download.txt"))
                      (getf dmeta :source)))
         (is (eq t (getf dmeta :keep)))
         (is (= 0 (getf dmeta :redownloads)))
