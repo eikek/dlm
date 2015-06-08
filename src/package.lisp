@@ -67,6 +67,7 @@
            *youtube-dl-args*
            *download-notify-hook*
            file-metadata-valid?
+           add-fetch-config
            program-exists?
            dlm-local-source?
            dlm-download

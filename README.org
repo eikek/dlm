@@ -419,11 +419,13 @@ The options to curl are stored in ~*fetch-default-args*~, it is
 =-O#C - ~a= where =~a= is replaced with the url. This string must
 contain one =~a=.
 
-Likewise the =youtube-dl= program is configured:
+Likewise the =youtube-dl= and =scp= program is configured:
 
 #+begin_src lisp
 (setq *youtube-dl-bin* "/path/to/youtube-dl")
 (setq *youtube-dl-args "--option1 ~a")
+(setq *scp-bin* "scp")
+(setq *scp-args* "~a .")
 #+end_src
 
 As with curl the single =~a= in the line is replaced with the url.
@@ -466,7 +468,7 @@ A config file may look like this:
 #+end_src
 
 By default, this list contains a fetch-config for the =youtube-dl=
-command and one for =curl=.
+command, for the =scp= command and one for =curl=.
 
 *** be notified when download is done
 

@@ -62,6 +62,13 @@
 (defparameter *youtube-dl-args* "--prefer-free-formats --no-playlist ~a"
   "Options for youtube-dl to fetch video urls.")
 
+(defparameter *scp-bin* "scp"
+  "The scp executable.")
+
+(defparameter *scp-args* "~a ."
+  "Options appended to the scp command. A ~a is replaced with the
+  given url.")
+
 (defparameter *download-notify-hook* nil)
 
 (defun make-file-metadata (filename)
@@ -176,6 +183,20 @@ metadata plist."
       (when (= rcval 0)
         filename))))
 
+(defun fetch-scp-url? (url)
+  (and (> (length url) 6)
+       (string= "ssh://" (subseq url 0 6))))
+
+(defun fetch-scp (url &optional user pass)
+  (declare (ignore user) (ignore pass))
+  (let* ((sshurl (subseq url 6))
+         (args (string-split #\Space (format nil *scp-args* sshurl)))
+         (filename (file-namestring sshurl)))
+    (multiple-value-bind (rckey rcval)
+        (external-program:run *scp-bin* args :input t :output t)
+      (declare (ignore rckey))
+      (when (= rcval 0)
+        filename))))
 
 (defclass fetch-config ()
   ((can-fetch? :initarg :can-fetch?
@@ -206,6 +227,11 @@ metadata plist."
                  :can-fetch? #'fetch-yt-url?
                  :fetch #'fetch-yt))
 
+(defvar *scp-fetch-config*
+  (make-instance 'fetch-config
+                 :can-fetch? #'fetch-scp-url?
+                 :fetch #'fetch-scp))
+
 (defun add-fetch-config (&key can-fetch? fetch)
   "Add a new fetch-config object at the beginning of the list."
   (push (make-instance 'fetch-config
@@ -213,17 +239,9 @@ metadata plist."
                        :fetch fetch)
         *fetch-configs*))
 
-
-(defun add-fetch-config-default ()
-  (setq *fetch-configs*
-        (adjoin *default-fetch-config* *fetch-configs*)))
-
-(defun add-fetch-config-youtube ()
-  (setq *fetch-configs*
-        (adjoin *youtube-dl-fetch-config* *fetch-configs*)))
-
 (setq *fetch-configs*
-      (list *youtube-dl-fetch-config*
+      (list *scp-fetch-config*
+            *youtube-dl-fetch-config*
             *default-fetch-config*))
 
 (defun fetch-get-download-fn (url)

@@ -262,6 +262,7 @@ pkgs.stdenv.mkDerivation rec {
     sed -i 's|LISP=sbcl|LISP=${pkgs.sbcl}/bin/sbcl|g' build/Makefile
     sed -i 's|*fetch-default-bin* "curl"|*fetch-default-bin* "${pkgs.curl}/bin/curl"|g' src/dlm.lisp
     sed -i 's|*youtube-dl-bin* "youtube-dl"|*youtube-dl-bin* "${pkgs.youtube-dl}/bin/youtube-dl"|g' src/dlm.lisp
+    sed -i 's|*scp-bin* "scp"|*scp-bin* "${pkgs.openssh}/bin/scp"|g' src/dlm.lisp
   '';
 
   buildPhase = ''
@@ -276,8 +277,6 @@ pkgs.stdenv.mkDerivation rec {
   '';
 
   dontStrip = true;
-
-  propagateBuildInputs = [ pkgs.sqlite ];
 
   buildInputs = with lispAdd; [
     fiveam
