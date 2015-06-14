@@ -176,7 +176,7 @@ help is shown."
   (let ((cmd (find-command name)))
     (if cmd
         (funcall (car cmd) argv)
-        (echo "Error: command '~a' unknown." name))))
+        (user-error "Error: command '~a' unknown." name))))
 
 (defcommand help (&free command)
   "Shows a short help for this program.
