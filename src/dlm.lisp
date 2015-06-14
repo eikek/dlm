@@ -32,7 +32,7 @@
 (defparameter *fetch-default-bin* "curl"
   "The executable that is used by default to download.")
 
-(defparameter *fetch-default-args* "-O#C - ~a"
+(defparameter *fetch-default-args* "--netrc -O#C - ~a"
   "Options to use for downloading files. The string is first expanded
   with the url using `format'. There must be one ~a control string
   specified that is replaced witht he url.")
@@ -59,7 +59,7 @@
 (defparameter *youtube-dl-bin* "youtube-dl"
   "The youtube-dl executable.")
 
-(defparameter *youtube-dl-args* "--prefer-free-formats --no-playlist ~a"
+(defparameter *youtube-dl-args* "--netrc --prefer-free-formats --no-playlist ~a"
   "Options for youtube-dl to fetch video urls.")
 
 (defparameter *scp-bin* "scp"
@@ -139,9 +139,15 @@ metadata plist."
         (declare (ignore rckey))
         (= 0 rcval))))
 
+(defun make-fetch-default-args (url &optional user pass)
+  (append
+   (if user
+       `("--user" ,(format nil "~a~@[:~a~]" user pass)))
+   (string-split #\Space
+                 (format nil *fetch-default-args* url))))
+
 (defun fetch-default (url &optional user pass)
-  (declare (ignore user) (ignore pass))
-  (let ((opts (string-split #\Space (format nil *fetch-default-args* url))))
+  (let* ((opts (make-fetch-default-args url user pass)))
     (multiple-value-bind (rckey rcval)
         (external-program:run *fetch-default-bin* opts :input t :output t)
       (declare (ignore rckey))
@@ -173,10 +179,17 @@ metadata plist."
                  (find extr urldc :test #'string=))
                urls))))
 
+(defun make-fetch-yt-args (url &optional user pass)
+  (append
+   (cond-> '()
+     (user (append `("--username" ,user)))
+     (pass (append `("--password" ,pass))))
+   (string-split #\Space
+                 (format nil *youtube-dl-args* url))))
+
 (defun fetch-yt (url &optional user pass)
-  (declare (ignore user) (ignore pass))
-  (let ((args (string-split #\Space (format nil *youtube-dl-args* url)))
-        (filename (fetch-yt-get-filename url)))
+  (let* ((args (make-fetch-yt-args url user pass))
+         (filename (fetch-yt-get-filename url)))
     (multiple-value-bind (rckey rcval)
         (external-program:run *youtube-dl-bin* args :input t :output t)
       (declare (ignore rckey))
@@ -187,11 +200,17 @@ metadata plist."
   (and (> (length url) 6)
        (string= "ssh://" (subseq url 0 6))))
 
+(defun make-fetch-scp-args (url &optional user)
+  (append
+   (if user
+       (list (format nil "-oUser=~a" user)))
+   (string-split #\Space
+                 (format nil *scp-args* (subseq url 6)))))
+
 (defun fetch-scp (url &optional user pass)
-  (declare (ignore user) (ignore pass))
-  (let* ((sshurl (subseq url 6))
-         (args (string-split #\Space (format nil *scp-args* sshurl)))
-         (filename (file-namestring sshurl)))
+  (declare (ignore pass))
+  (let* ((args (make-fetch-scp-args url user))
+         (filename (file-namestring url)))
     (multiple-value-bind (rckey rcval)
         (external-program:run *scp-bin* args :input t :output t)
       (declare (ignore rckey))

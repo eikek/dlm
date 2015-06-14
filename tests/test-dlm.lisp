@@ -90,3 +90,27 @@
         (is (eq t (getf dmeta :keep)))
         (is (= 0 (getf dmeta :redownloads)))
         (is (= dlm::*file-lifetime* (getf dmeta :lifetime)))))))
+
+(test make-fetch-default-args
+  (is (equalp (dlm::make-fetch-default-args "http://blup.com")
+              '("--netrc" "-O#C" "-" "http://blup.com")))
+  (is (equalp (dlm::make-fetch-default-args "http://blup.com" "me")
+              '("--user" "me" "--netrc" "-O#C" "-" "http://blup.com")))
+  (is (equalp (dlm::make-fetch-default-args "http://blup.com" "me" "pass")
+              '("--user" "me:pass" "--netrc" "-O#C" "-" "http://blup.com"))))
+
+(test make-fetch-yt-args
+  (is (equalp (dlm::make-fetch-yt-args "http://youtube.com")
+              '("--netrc" "--prefer-free-formats" "--no-playlist" "http://youtube.com")))
+  (is (equalp (dlm::make-fetch-yt-args "http://youtube.com" "me" "pass")
+              '("--username" "me" "--password" "pass" "--netrc"
+                "--prefer-free-formats" "--no-playlist" "http://youtube.com")))
+  (is (equalp (dlm::make-fetch-yt-args "http://youtube.com" "me")
+              '("--username" "me" "--netrc" "--prefer-free-formats"
+                "--no-playlist" "http://youtube.com"))))
+
+(test make-fetch-scp-args
+  (is (equalp (dlm::make-fetch-scp-args "ssh://test.com")
+              '("test.com" ".")))
+  (is (equalp (dlm::make-fetch-scp-args "ssh://me@test.com" "otherme")
+              '("-oUser=otherme" "me@test.com" "."))))
