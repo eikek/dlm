@@ -59,7 +59,7 @@
 (defparameter *youtube-dl-bin* "youtube-dl"
   "The youtube-dl executable.")
 
-(defparameter *youtube-dl-args* "--netrc --prefer-free-formats --no-playlist ~a"
+(defparameter *youtube-dl-args* "--prefer-free-formats --no-playlist ~a"
   "Options for youtube-dl to fetch video urls.")
 
 (defparameter *scp-bin* "scp"
@@ -180,12 +180,16 @@ metadata plist."
                urls))))
 
 (defun make-fetch-yt-args (url &optional user pass)
-  (append
-   (cond-> '()
-     (user (append `("--username" ,user)))
-     (pass (append `("--password" ,pass))))
-   (string-split #\Space
-                 (format nil *youtube-dl-args* url))))
+  (let ((netrc (probe-file
+                (merge-pathnames #p".netrc"
+                                 (user-homedir-pathname)))))
+    (append
+     (cond-> '()
+             (netrc (append '("--netrc")))
+             (user (append `("--username" ,user)))
+             (pass (append `("--password" ,pass))))
+     (string-split #\Space
+                   (format nil *youtube-dl-args* url)))))
 
 (defun fetch-yt (url &optional user pass)
   (let* ((args (make-fetch-yt-args url user pass))

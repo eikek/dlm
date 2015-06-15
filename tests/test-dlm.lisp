@@ -101,12 +101,12 @@
 
 (test make-fetch-yt-args
   (is (equalp (dlm::make-fetch-yt-args "http://youtube.com")
-              '("--netrc" "--prefer-free-formats" "--no-playlist" "http://youtube.com")))
+              '("--prefer-free-formats" "--no-playlist" "http://youtube.com")))
   (is (equalp (dlm::make-fetch-yt-args "http://youtube.com" "me" "pass")
-              '("--username" "me" "--password" "pass" "--netrc"
+              '("--username" "me" "--password" "pass"
                 "--prefer-free-formats" "--no-playlist" "http://youtube.com")))
   (is (equalp (dlm::make-fetch-yt-args "http://youtube.com" "me")
-              '("--username" "me" "--netrc" "--prefer-free-formats"
+              '("--username" "me" "--prefer-free-formats"
                 "--no-playlist" "http://youtube.com"))))
 
 (test make-fetch-scp-args
