@@ -123,10 +123,10 @@ let
       version = "darcs-2014-11-01";
       description = "Iteration package for Common Lisp";
       deps = [];
-      src = (pkgs.lib.overrideDerivation (pkgs.fetchdarcs {
-        url = "http://common-lisp.net/project/iterate/darcs/iterate";
-        sha256 = "0gm05s3laiivsqgqjfj1rkz83c2c0jyn4msfgbv6sz42znjpam25";
-      }) (x: {SSL_CERT_FILE=pkgs.cacert + "/etc/ca-bundle.crt";}));
+      src = pkgs.fetchurl {
+        url = http://common-lisp.net/project/iterate/releases/iterate-current.tar.gz;
+        sha256 = "1qlzil08mazy1h0dvw8f4ry82dfkwrnflyvm81p1h4glp2s3jhra";
+      };
       overrides = x: {
         configurePhase="buildPhase(){ true; }";
       };
@@ -286,6 +286,7 @@ pkgs.stdenv.mkDerivation rec {
     cl-ansi-text
     external-program
     pkgs.sqlite
+    pkgs.asdf
 
     # the following are needed for "make release"
     pkgs.git
