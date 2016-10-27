@@ -99,15 +99,22 @@
   (is (equalp (dlm::make-fetch-default-args "http://blup.com" "me" "pass")
               '("--user" "me:pass" "--netrc" "-O#C" "-" "http://blup.com"))))
 
+(defun cons-netrc (l)
+  (if (probe-file
+       (merge-pathnames #p".netrc"
+                        (user-homedir-pathname)))
+      (cons "--netrc" l)
+      l))
+
 (test make-fetch-yt-args
   (is (equalp (dlm::make-fetch-yt-args "http://youtube.com")
-              '("--prefer-free-formats" "--no-playlist" "http://youtube.com")))
+              (cons-netrc '("--prefer-free-formats" "--no-playlist" "http://youtube.com"))))
   (is (equalp (dlm::make-fetch-yt-args "http://youtube.com" "me" "pass")
-              '("--username" "me" "--password" "pass"
-                "--prefer-free-formats" "--no-playlist" "http://youtube.com")))
+              (cons-netrc '("--username" "me" "--password" "pass"
+                            "--prefer-free-formats" "--no-playlist" "http://youtube.com"))))
   (is (equalp (dlm::make-fetch-yt-args "http://youtube.com" "me")
-              '("--username" "me" "--prefer-free-formats"
-                "--no-playlist" "http://youtube.com"))))
+              (cons-netrc '("--username" "me" "--prefer-free-formats"
+                            "--no-playlist" "http://youtube.com")))))
 
 (test make-fetch-scp-args
   (is (equalp (dlm::make-fetch-scp-args "ssh://test.com")
