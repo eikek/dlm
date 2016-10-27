@@ -175,9 +175,12 @@ metadata plist."
                                                            :output s))))
            (urls (mapcar #'string-downcase url-list))
            (urldc (string-split '(#\. #\/) (string-downcase url))))
-      (find-if (lambda (extr)
-                 (find extr urldc :test #'string=))
-               urls))))
+      (let ((result
+             (find-if (lambda (extr)
+                        (find extr urldc :test #'string=))
+                      urls)))
+        (echo "youtube: ~a" result)
+        result))))
 
 (defun make-fetch-yt-args (url &optional user pass)
   (let ((netrc (probe-file
@@ -457,6 +460,12 @@ function. The second argument is the current db handle."
                      (funcall fun md db)))
                  db :where (non-empty query) :table table))))
 
+(defun file-move (source destination)
+  (with-open-file (in source :direction :input)
+    (with-open-file (out destination :direction :output)
+      (uiop:copy-file in out)))
+  (uiop:delete-file-if-exists source))
+
 (defun dlm-change-metadata (metadata &key (keep nil keep-p) (lifetime nil lifetimep) db)
   "Changes the keep flag and/or the lifetime value of the given
 metadata and updates the database."
@@ -483,7 +492,10 @@ updating the database accordingly."
         (unless (equalp file newfile)
           (unless silent
             (format t "Move ~a → ~a~%" file newfile))
-          (rename-file file newfile)
+          (handler-case
+              (rename-file file newfile)
+            (error ()
+              (file-move file newfile)))
           (db-metadata-delete! metadata db :table "dlm_files")
           (if (dlm-local-source? metadata)
               (db-upsert! (update-metadata newmeta :source (namestring newfile)) db

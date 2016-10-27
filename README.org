@@ -75,7 +75,7 @@ menu. It generates the text, erases everything between the =# --
 usage-start= and =# -- usage-end= markers and inserts the new text.
 
 #+begin_src emacs-lisp :results none
-    (defvar dlm/bin "./build/dlm-0.0.1")
+    (defvar dlm/bin "./build/dlm-0.0.2")
 
     (unless (file-exists-p dlm/bin)
       (user-error "Please make the dlm executable first."))

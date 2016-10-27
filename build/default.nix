@@ -64,7 +64,7 @@ let
       src = pkgs.fetchgit {
         url = https://github.com/astine/unix-options;
         rev = "501849bd7d24748e52fe2cd6734f137f78019256";
-        sha256 = "1bzchf4grb9r6n69l92hwj7m57jknws086fykd4nzrlc38hascn3";
+        sha256 = "01p511qyh81kzbs0iaf8l2zdjhn3pbivy0hncxl2k7hg5xa0ch1i";
       };
     };
 
@@ -113,7 +113,7 @@ let
       deps = [];
       src = pkgs.fetchgit {
         url = "https://gitlab.common-lisp.net/alexandria/alexandria.git";
-        sha256 = "0q3x3x7y6ahrv9j6h76l8lmwb8kn4wvwv7xk79b9nssi6xdvw3as";
+        sha256 = "0qg59lvml23cs26gm59k7skf301p527mmxpirhi0j0mzbmqv3mkq";
         rev = ''5a17c072970cf50213f7f896c40e6e640638391f'';
       };
     };
@@ -143,8 +143,8 @@ let
       };
       overrides = x:  {
         patchPhase = ''
-          sed -i 's|libsqlite3.so|${pkgs.sqlite}/lib/libsqlite3.so|g' sqlite-ffi.lisp
-          sed -i 's|libsqlite3.so.0|${pkgs.sqlite}/lib/libsqlite3.so.0|g' sqlite-ffi.lisp
+          sed -i 's|libsqlite3.so|${pkgs.sqlite.out}/lib/libsqlite3.so|g' sqlite-ffi.lisp
+          sed -i 's|libsqlite3.so.0|${pkgs.sqlite.out}/lib/libsqlite3.so.0|g' sqlite-ffi.lisp
         '';
       };
     };
@@ -157,7 +157,7 @@ let
       # Source type: git
       src = pkgs.fetchgit {
         url = ''https://github.com/froydnj/nibbles'';
-        sha256 = "39ad95be2b9f9ea80dbccd205a0ed6f9c5ef175a10da6eec55b7ba09a8f1a76a";
+        sha256 = "0p0swss7xjx74sr95wqak5hfhfw13bwkzncy4l4hbfy130gncv8b";
         rev = ''ace095d85e48b18bf9cf9e21249ba7fb57e3efe2'';
       };
     };
@@ -216,7 +216,7 @@ let
       src = pkgs.fetchgit {
         url = https://github.com/tpapp/let-plus;
         rev = "079730bfca755b4dcaf5295e380eb5adf3fc6a7c";
-        sha256 = "0xzg7gavcxrh43vzdzj68c6ixsnmpk0aip9j5yx78xxwv1nr09f0";
+        sha256 = "1zpd9nshmlknhqqwc2vjxypqhkg5bq8pg6mw7jwnqaqzjdw4cwrs";
       };
     };
 

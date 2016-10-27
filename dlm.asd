@@ -2,7 +2,7 @@
 
 (defsystem :dlm
   :description "A convenient wrapper around download programs."
-  :version "0.0.1"
+  :version "0.0.2"
   :author "Eike Kettner <eike.kettner@posteo.de>"
   :entry-point "dlm-cli:main"
   :licence "GPLv3"
